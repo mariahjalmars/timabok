@@ -343,7 +343,13 @@
       <option value="Íslenski ferðaklasinn">Íslenski ferðaklasinn</option>
       <option value="Markaðsstofa Höfuðborgarsvæðisins">Markaðsstofa Höfuðborgarsvæðisins</option>
       <option value="ÍMARK">ÍMARK</option>
+      <option value="__annad__">✏️ Annað fyrirtæki...</option>
     </select>
+  </div>
+
+  <div class="field" id="other-company-field" style="display:none;">
+    <label>Nafn fyrirtækis</label>
+    <input type="text" id="other-company" placeholder="Skrifaðu nafn fyrirtækis..." />
   </div>
 
   <div class="field" id="project-field">
@@ -353,8 +359,8 @@
     </select>
   </div>
 
-  <div class="field" id="note-field" style="display:none;">
-    <label>Skýring</label>
+  <div class="field">
+    <label>Skýring <span style="color:var(--ink-muted);font-size:0.65rem;">(valfrjálst)</span></label>
     <input type="text" id="note" placeholder="Stutt skýring á vinnu..." />
   </div>
 
@@ -426,25 +432,32 @@ function loadCredentials() {
 function updateProjects() {
   const company = document.getElementById('company').value;
   const projectSel = document.getElementById('project');
-  const noteField = document.getElementById('note-field');
   const projectField = document.getElementById('project-field');
+  const otherField = document.getElementById('other-company-field');
 
   if (!company) {
     projectSel.innerHTML = '<option value="">— Veldu fyrst fyrirtæki —</option>';
     projectSel.disabled = true;
-    noteField.style.display = 'none';
+    otherField.style.display = 'none';
     return;
   }
+
+  if (company === '__annad__') {
+    otherField.style.display = 'block';
+    projectField.style.display = 'none';
+    projectSel.disabled = true;
+    return;
+  }
+
+  otherField.style.display = 'none';
+  document.getElementById('other-company').value = '';
 
   const projs = PROJECTS[company];
 
   if (projs === null) {
-    // ÍMARK — note only
     projectField.style.display = 'none';
-    noteField.style.display = 'block';
   } else {
     projectField.style.display = 'block';
-    noteField.style.display = 'none';
     projectSel.disabled = false;
     projectSel.innerHTML = '<option value="">— Veldu verkefni —</option>';
     projs.forEach(p => {
@@ -456,16 +469,21 @@ function updateProjects() {
 }
 
 async function submitEntry() {
-  const company = document.getElementById('company').value;
-  const project = PROJECTS[company] === null ? '' : document.getElementById('project').value;
+  let company = document.getElementById('company').value;
+  if (company === '__annad__') {
+    company = document.getElementById('other-company').value.trim();
+    if (!company) { showToast('Skrifaðu nafn fyrirtækis', true); return; }
+  }
+  const project = PROJECTS[document.getElementById('company').value] === null ? '' : document.getElementById('project').value;
   const note = document.getElementById('note').value.trim();
   const hours = parseFloat(document.getElementById('hours').value);
   const date = document.getElementById('date-input').value;
 
   if (!company) { showToast('Veldu fyrirtæki', true); return; }
-  if (PROJECTS[company] !== null && !project) { showToast('Veldu verkefni', true); return; }
+  const selectedCompany = document.getElementById('company').value;
+  if (selectedCompany !== '__annad__' && PROJECTS[selectedCompany] !== null && !project) { showToast('Veldu verkefni', true); return; }
   if (!hours || hours <= 0) { showToast('Sláðu inn klukkustundir', true); return; }
-  if (PROJECTS[company] === null && !note) { showToast('Sláðu inn skýringu', true); return; }
+  if (selectedCompany === 'ÍMARK' && !note) { showToast('Sláðu inn skýringu fyrir ÍMARK', true); return; }
 
   const btn = document.getElementById('submit-btn');
   btn.disabled = true;
@@ -497,9 +515,10 @@ async function submitEntry() {
   document.getElementById('company').value = '';
   document.getElementById('project').innerHTML = '<option value="">— Veldu fyrst fyrirtæki —</option>';
   document.getElementById('project').disabled = true;
+  document.getElementById('other-company').value = '';
+  document.getElementById('other-company-field').style.display = 'none';
   document.getElementById('note').value = '';
   document.getElementById('hours').value = '';
-  document.getElementById('note-field').style.display = 'none';
   document.getElementById('project-field').style.display = 'block';
   btn.disabled = false;
   btn.textContent = '→ Vista í Sheets';
