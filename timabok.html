@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Tímabók</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap');
+
+  :root {
+    --bg: #F5F0E8;
+    --surface: #FDFAF4;
+    --ink: #1A1714;
+    --ink-muted: #6B6560;
+    --accent: #C84B2F;
+    --accent-light: #F2E8E4;
+    --border: #D8D0C4;
+    --success: #2D6A4F;
+    --success-light: #E8F4EE;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+  }
+
+  header {
+    width: 100%;
+    max-width: 440px;
+    margin-bottom: 28px;
+    text-align: center;
+  }
+
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 2rem;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  header h1 span {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .date-badge {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    background: var(--border);
+    padding: 4px 12px;
+    border-radius: 99px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 2px 12px rgba(26,23,20,0.07);
+  }
+
+  .field {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 7px;
+  }
+
+  select, input[type="number"], input[type="text"] {
+    width: 100%;
+    padding: 12px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.92rem;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: border-color 0.15s;
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6560' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  select:focus, input:focus {
+    border-color: var(--accent);
+    background: var(--surface);
+  }
+
+  select:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .hours-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .note {
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+    margin-top: 5px;
+  }
+
+  /* Auth section */
+  .auth-section {
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    background: var(--accent-light);
+    border: 1.5px dashed var(--accent);
+    border-radius: var(--radius);
+  }
+
+  .auth-section p {
+    font-size: 0.78rem;
+    color: var(--accent);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .auth-section input {
+    font-size: 0.8rem;
+    padding: 10px 12px;
+  }
+
+  .auth-section .sheet-input-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .auth-section .sheet-input-row input {
+    flex: 1;
+  }
+
+  /* Buttons */
+  .btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+    padding: 13px 20px;
+  }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    margin-top: 8px;
+    font-size: 0.88rem;
+    padding: 16px;
+    letter-spacing: 0.1em;
+  }
+
+  .btn-primary:hover { background: #A83D25; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-sm {
+    padding: 10px 16px;
+    background: var(--accent);
+    color: white;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+  .btn-sm:hover { background: #A83D25; }
+
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--ink-muted);
+    padding: 10px 16px;
+    font-size: 0.75rem;
+  }
+  .btn-outline:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--success);
+    color: white;
+    padding: 14px 24px;
+    border-radius: 99px;
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 999;
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+  #toast.error { background: var(--accent); }
+
+  /* History */
+  .history-toggle {
+    width: 100%;
+    max-width: 440px;
+    margin-top: 16px;
+    text-align: center;
+  }
+
+  #history-list {
+    width: 100%;
+    max-width: 440px;
+    margin-top: 12px;
+  }
+
+  .history-entry {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    font-size: 0.78rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .history-entry .entry-left { line-height: 1.6; }
+  .history-entry .entry-hours {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .divider {
+    width: 100%;
+    max-width: 440px;
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  .setup-steps {
+    width: 100%;
+    max-width: 440px;
+    margin-top: 4px;
+  }
+  .setup-steps h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 1rem;
+    margin-bottom: 12px;
+    color: var(--ink-muted);
+  }
+  .step {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--ink-muted);
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    margin-top: 1px;
+  }
+  .step a { color: var(--accent); }
+
+  .connected-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--success);
+    background: var(--success-light);
+    padding: 4px 12px;
+    border-radius: 99px;
+    margin-bottom: 14px;
+  }
+  .dot { width: 7px; height: 7px; background: var(--success); border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tíma<span>bók</span></h1>
+  <div class="date-badge" id="date-display"></div>
+</header>
+
+<div class="card">
+
+  <div id="connected-area">
+    <div class="connected-badge"><div class="dot"></div>TENGT VIÐ GOOGLE SHEETS</div>
+  </div>
+
+  <!-- Form -->
+  <div class="field">
+    <label>Fyrirtæki</label>
+    <select id="company" onchange="updateProjects()">
+      <option value="">— Veldu fyrirtæki —</option>
+      <option value="Íslenski ferðaklasinn">Íslenski ferðaklasinn</option>
+      <option value="Markaðsstofa Höfuðborgarsvæðisins">Markaðsstofa Höfuðborgarsvæðisins</option>
+      <option value="ÍMARK">ÍMARK</option>
+    </select>
+  </div>
+
+  <div class="field" id="project-field">
+    <label>Verkefni / Undirverkefni</label>
+    <select id="project" disabled>
+      <option value="">— Veldu fyrst fyrirtæki —</option>
+    </select>
+  </div>
+
+  <div class="field" id="note-field" style="display:none;">
+    <label>Skýring</label>
+    <input type="text" id="note" placeholder="Stutt skýring á vinnu..." />
+  </div>
+
+  <div class="hours-row">
+    <div class="field">
+      <label>Klukkustundir</label>
+      <input type="number" id="hours" min="0" max="24" step="0.5" placeholder="0" />
+      <div class="note">t.d. 2.5 = 2½ klst</div>
+    </div>
+    <div class="field">
+      <label>Dagsetning</label>
+      <input type="text" id="date-input" readonly style="cursor:default;opacity:0.7;" />
+    </div>
+  </div>
+
+  <button class="btn btn-primary" onclick="submitEntry()" id="submit-btn">
+    → Vista í Sheets
+  </button>
+</div>
+
+<!-- History -->
+<div class="history-toggle" id="history-toggle" style="display:none;">
+  <button class="btn btn-outline" onclick="toggleHistory()">Sýna síðustu færslur ↓</button>
+</div>
+<div id="history-list"></div>
+
+<hr class="divider">
+<div class="setup-steps">
+  <h3>Bæta við heimaskjáinn 📱</h3>
+  <div class="step">
+    <div class="step-num">1</div>
+    <div>Opnaðu þessa síðu í <strong>Safari</strong> á iPhone</div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div>Ýttu á <strong>Deila</strong> táknið (ferningur með örvina upp)</div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div>Veldu <strong>"Bæta við heimaskjá"</strong> — þá er hún eins og app!</div>
+  </div>
+</div>
+
+<div id="toast">✓ Vistað!</div>
+
+<script>
+const PROJECTS = {
+  'Íslenski ferðaklasinn': ['NorReg','IFK','Grindavík','Almenn vinna'],
+  'Markaðsstofa Höfuðborgarsvæðisins': ['Elliðaárdalur','Öskjuhlíð','Seltjarnarnes','Almennt'],
+  'ÍMARK': null
+};
+
+// Date
+const today = new Date();
+const dateStr = today.toLocaleDateString('is-IS', {year:'numeric',month:'2-digit',day:'2-digit'});
+const dateDisplay = today.toLocaleDateString('is-IS', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+document.getElementById('date-display').textContent = dateDisplay;
+document.getElementById('date-input').value = dateStr;
+
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby89m4IODFavEV649dJuR1J3cp81n21_-OufVXyjDQRznyB30PC84Gk8hgku5CZr0_u/exec';
+
+// Local history
+let localHistory = JSON.parse(localStorage.getItem('timabok_history') || '[]');
+
+function loadCredentials() {
+  document.getElementById('history-toggle').style.display = 'block';
+}
+
+function updateProjects() {
+  const company = document.getElementById('company').value;
+  const projectSel = document.getElementById('project');
+  const noteField = document.getElementById('note-field');
+  const projectField = document.getElementById('project-field');
+
+  if (!company) {
+    projectSel.innerHTML = '<option value="">— Veldu fyrst fyrirtæki —</option>';
+    projectSel.disabled = true;
+    noteField.style.display = 'none';
+    return;
+  }
+
+  const projs = PROJECTS[company];
+
+  if (projs === null) {
+    // ÍMARK — note only
+    projectField.style.display = 'none';
+    noteField.style.display = 'block';
+  } else {
+    projectField.style.display = 'block';
+    noteField.style.display = 'none';
+    projectSel.disabled = false;
+    projectSel.innerHTML = '<option value="">— Veldu verkefni —</option>';
+    projs.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p; opt.textContent = p;
+      projectSel.appendChild(opt);
+    });
+  }
+}
+
+async function submitEntry() {
+  const company = document.getElementById('company').value;
+  const project = PROJECTS[company] === null ? '' : document.getElementById('project').value;
+  const note = document.getElementById('note').value.trim();
+  const hours = parseFloat(document.getElementById('hours').value);
+  const date = document.getElementById('date-input').value;
+
+  if (!company) { showToast('Veldu fyrirtæki', true); return; }
+  if (PROJECTS[company] !== null && !project) { showToast('Veldu verkefni', true); return; }
+  if (!hours || hours <= 0) { showToast('Sláðu inn klukkustundir', true); return; }
+  if (PROJECTS[company] === null && !note) { showToast('Sláðu inn skýringu', true); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Vistandi...';
+
+  const displayProject = PROJECTS[company] === null ? note : project;
+  const row = [date, company, displayProject, hours, note];
+
+  // Save to local history always
+  localHistory.unshift({date, company, project: displayProject, hours, note});
+  if (localHistory.length > 20) localHistory.pop();
+  localStorage.setItem('timabok_history', JSON.stringify(localHistory));
+
+  // Send to Google Sheets via Apps Script
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({date, company, project: displayProject, hours, note})
+    });
+    showToast('✓ Vistað í Google Sheets!');
+  } catch(e) {
+    showToast('Villa við vistun', true);
+    console.error(e);
+  }
+
+  // Reset
+  document.getElementById('company').value = '';
+  document.getElementById('project').innerHTML = '<option value="">— Veldu fyrst fyrirtæki —</option>';
+  document.getElementById('project').disabled = true;
+  document.getElementById('note').value = '';
+  document.getElementById('hours').value = '';
+  document.getElementById('note-field').style.display = 'none';
+  document.getElementById('project-field').style.display = 'block';
+  btn.disabled = false;
+  btn.textContent = '→ Vista í Sheets';
+
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  if (!list.children.length && localHistory.length === 0) return;
+  if (list.style.display === 'none') return;
+  list.innerHTML = '';
+  localHistory.slice(0, 8).forEach(e => {
+    const div = document.createElement('div');
+    div.className = 'history-entry';
+    div.innerHTML = `
+      <div class="entry-left">
+        <strong>${e.company}</strong><br>
+        ${e.project}${e.note && e.project !== e.note ? ' — ' + e.note : ''}<br>
+        <span style="color:var(--ink-muted);font-size:0.7rem;">${e.date}</span>
+      </div>
+      <div class="entry-hours">${e.hours}h</div>`;
+    list.appendChild(div);
+  });
+}
+
+let historyVisible = false;
+function toggleHistory() {
+  const list = document.getElementById('history-list');
+  historyVisible = !historyVisible;
+  list.style.display = historyVisible ? 'block' : 'none';
+  document.querySelector('#history-toggle button').textContent = historyVisible ? 'Fela færslur ↑' : 'Sýna síðustu færslur ↓';
+  if (historyVisible) renderHistory();
+}
+
+function showToast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = isError ? 'error' : '';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+loadCredentials();
+</script>
+</body>
+</html>
