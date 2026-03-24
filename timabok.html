@@ -372,7 +372,7 @@
     </div>
     <div class="field">
       <label>Dagsetning</label>
-      <input type="text" id="date-input" readonly style="cursor:default;opacity:0.7;" />
+      <input type="date" id="date-input" />
     </div>
   </div>
 
@@ -415,7 +415,7 @@ const PROJECTS = {
 
 // Date
 const today = new Date();
-const dateStr = today.toLocaleDateString('is-IS', {year:'numeric',month:'2-digit',day:'2-digit'});
+const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD fyrir date input
 const dateDisplay = today.toLocaleDateString('is-IS', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
 document.getElementById('date-display').textContent = dateDisplay;
 document.getElementById('date-input').value = dateStr;
@@ -477,7 +477,9 @@ async function submitEntry() {
   const project = PROJECTS[document.getElementById('company').value] === null ? '' : document.getElementById('project').value;
   const note = document.getElementById('note').value.trim();
   const hours = parseFloat(document.getElementById('hours').value);
-  const date = document.getElementById('date-input').value;
+  const rawDate = document.getElementById('date-input').value;
+  const [y,m,d] = rawDate.split('-');
+  const date = `${d}.${m}.${y}`;
 
   if (!company) { showToast('Veldu fyrirtæki', true); return; }
   const selectedCompany = document.getElementById('company').value;
@@ -520,6 +522,7 @@ async function submitEntry() {
   document.getElementById('note').value = '';
   document.getElementById('hours').value = '';
   document.getElementById('project-field').style.display = 'block';
+  document.getElementById('date-input').value = dateStr;
   btn.disabled = false;
   btn.textContent = '→ Vista í Sheets';
 
