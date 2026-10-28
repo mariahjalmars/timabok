@@ -210,7 +210,6 @@
   }
   .dot { width: 7px; height: 7px; background: var(--success); border-radius: 50%; }
 
-  /* Progress bar */
   .month-progress {
     width: 100%; max-width: 440px; margin-bottom: 16px;
     background: var(--surface); border: 1px solid var(--border);
@@ -386,7 +385,7 @@ async function submitEntry() {
   const hours = parseFloat(document.getElementById('hours').value);
   const rawDate = document.getElementById('date-input').value;
   const [y,m,d] = rawDate.split('-');
-  const date = `${d}.${m}.${y}`;
+  const date = `${d}/${m}/${y}`;
 
   if (!company) { showToast('Veldu fyrirtæki', true); return; }
   const selectedCompany = document.getElementById('company').value;
@@ -473,7 +472,9 @@ async function loadMonthProgress() {
     const now = new Date();
     const mm = String(now.getMonth()+1).padStart(2,'0');
     const yyyy = now.getFullYear();
-    const res = await fetch(SCRIPT_URL + '?action=getMonth&month=' + mm + '&year=' + yyyy);
+    const res = await fetch(SCRIPT_URL + '?action=getMonth&month=' + mm + '&year=' + yyyy, {
+      redirect: 'follow'
+    });
     const data = await res.json();
     const hours = parseFloat(data.totalHours) || 0;
     const earnings = parseInt(data.totalEarnings) || 0;
